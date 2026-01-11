@@ -228,10 +228,10 @@ const SUPABASE_ANON_KEY = 'your-anon-public-key-here';
 
 **This repo is a public template with NO real credentials committed.**
 
-When you create your private deployment repo:
+When you create your **private** deployment repo:
 - ✅ You add YOUR real credentials to `config.js`
-- ✅ Commit them to your PRIVATE repo
-- ✅ Deploy to GitHub Pages from private repo
+- ✅ Commit them to your **PRIVATE** repo
+- ✅ Deploy to GitHub Pages from **private** repo
 - ✅ Your source code with credentials stays private in GitHub
 - ⚠️ The deployed site is public (credentials visible in browser - this is unavoidable for static sites)
 
