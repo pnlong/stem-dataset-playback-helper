@@ -1,7 +1,7 @@
-# Implementation Plan: Real Book Dataset Playback Helper
+# Implementation Plan: Stem-Separated Dataset Playback Helper
 
 ## Overview
-A web-based tool to help musicians record a stem-separated jazz improvisation dataset. The website provides click tracks and playback of previously-recorded stems, with shared progress tracking across the ensemble via Supabase.
+A web-based tool to help musicians record stem-separated datasets. The website provides click tracks and playback of previously-recorded stems, with shared progress tracking across the ensemble via Supabase.
 
 ## Technology Stack
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
@@ -82,13 +82,31 @@ CREATE INDEX idx_stems_song_id ON stems(song_id);
 CREATE INDEX idx_stems_instrument_id ON stems(instrument_id);
 ```
 
+### Row Level Security (RLS)
+```sql
+-- Enable RLS on all tables
+ALTER TABLE instruments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE songs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stems ENABLE ROW LEVEL SECURITY;
+
+-- Create permissive policies (allow all operations)
+CREATE POLICY "Enable all operations for instruments" ON instruments
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable all operations for songs" ON songs
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable all operations for stems" ON stems
+  FOR ALL USING (true) WITH CHECK (true);
+```
+
 ## Page-by-Page Implementation
 
 ### 1. Welcome Page (`index.html`)
 **Purpose**: Introduction and explanation of the recording process.
 
 **Content**:
-- Title: "Real Book Dataset Playback Helper"
+- Title: "Stem-Separated Dataset Playback Helper"
 - Explanation of what the website is for
 - Description of the recording process:
   - Instrument 1 records with click track
@@ -460,8 +478,8 @@ export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE
 The README should include:
 
 ### 1. **Project Description**
-- What this website is for (Real Book dataset recording helper)
-- Target users (jazz ensembles recording stem-separated improvisations)
+- What this website is for (stem-separated dataset recording helper)
+- Target users (musicians/ensembles recording stem-separated datasets)
 
 ### 2. **Features**
 - Click track generation at song-specific BPMs
@@ -490,8 +508,9 @@ cd playback_helper
 1. Go to [supabase.com](https://supabase.com)
 2. Create new project
 3. Wait for provisioning
-4. Go to Settings → API
-5. Copy `Project URL` and `anon public` key
+4. Get credentials:
+   - Project Settings > Data API > Copy **Project URL**
+   - Project Settings > API Keys > Legacy anon, service_role API keys > Copy **anon public** key
 
 **Step 3: Set Up Database Schema**
 1. In Supabase dashboard, go to SQL Editor
@@ -526,6 +545,21 @@ CREATE TABLE stems (
 -- Create indexes
 CREATE INDEX idx_stems_song_id ON stems(song_id);
 CREATE INDEX idx_stems_instrument_id ON stems(instrument_id);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE instruments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE songs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stems ENABLE ROW LEVEL SECURITY;
+
+-- Create permissive policies (allow all operations)
+CREATE POLICY "Enable all operations for instruments" ON instruments
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable all operations for songs" ON songs
+  FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable all operations for stems" ON stems
+  FOR ALL USING (true) WITH CHECK (true);
 ```
 
 **Step 4: Configure Environment Variables**

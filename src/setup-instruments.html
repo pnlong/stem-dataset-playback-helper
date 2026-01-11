@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Instruments - Stem Dataset Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container container-narrow">
+    <h1>Setup Ensemble Instruments</h1>
+
+    <div class="alert alert-info">
+      <strong>Order Matters!</strong> Add instruments in the order they will record.
+      The first instrument records with only the click track. Each subsequent instrument
+      records while hearing the previous instruments' recordings.
+    </div>
+
+    <div id="messageArea"></div>
+
+    <div class="card">
+      <h3>Add Instruments</h3>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          id="instrumentInput"
+          placeholder="Enter instrument name (e.g., Piano, Bass, Drums)"
+          style="flex: 1; margin-bottom: 0;"
+        />
+        <button class="btn btn-primary" id="addBtn" style="padding: 10px 20px;">
+          Add
+        </button>
+      </div>
+    </div>
+
+    <div id="instrumentsList" class="mt-3">
+      <h3>Recording Order</h3>
+      <div id="emptyState" class="text-center text-secondary mt-2">
+        No instruments added yet. Add your first instrument above.
+      </div>
+      <ul id="instrumentsUl" class="list hidden"></ul>
+    </div>
+
+    <div class="card mt-3">
+      <h3>Recording Process Reminder</h3>
+      <p>With your instruments in order, the recording process will be:</p>
+      <ol id="recordingSteps" style="padding-left: 20px; line-height: 2;">
+        <li class="text-secondary">Add instruments to see the recording order...</li>
+      </ol>
+    </div>
+
+    <div id="actionButtons" class="mt-3 hidden">
+      <button class="btn btn-primary" id="confirmBtn" style="width: 100%; padding: 15px 40px; font-size: 1.1rem;">
+        Confirm and Continue
+      </button>
+    </div>
+
+    <div id="loadingSpinner" class="hidden">
+      <div class="spinner"></div>
+      <p class="text-center">Saving instruments...</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/setup-instruments.js"></script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Song List - Stem Dataset Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="flex justify-between items-center mb-3">
+      <h1>Stem-Separated Dataset</h1>
+      <div class="flex gap-2">
+        <button class="btn btn-primary" id="downloadBtn">
+          📥 Download Data
+        </button>
+        <button class="btn btn-danger" id="resetBtn">
+          Reset Everything
+        </button>
+      </div>
+    </div>
+
+    <div class="progress-container">
+      <h3>Overall Progress</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        <span class="progress-text" id="progressText">0%</span>
+      </div>
+      <p class="text-secondary mt-1" id="progressDetails">
+        Loading...
+      </p>
+    </div>
+
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchBox"
+        class="search-box"
+        placeholder="Search by song ID..."
+      />
+    </div>
+
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
+      <p class="text-center">Loading songs...</p>
+    </div>
+
+    <div id="songsGrid" class="grid hidden"></div>
+
+    <div id="emptyState" class="text-center mt-3 hidden">
+      <p class="text-secondary">No songs found matching your search.</p>
+    </div>
+  </div>
+
+  <!-- Reset Confirmation Modal -->
+  <div id="resetModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Reset Everything?</h2>
+        <button class="modal-close" id="closeResetModal">&times;</button>
+      </div>
+      <div class="alert alert-warning">
+        <strong>⚠️ WARNING:</strong> This will permanently delete ALL data including:
+        <ul style="margin-top: 10px; padding-left: 20px;">
+          <li>All songs</li>
+          <li>All instruments</li>
+          <li>All stems and offsets</li>
+          <li>All passwords</li>
+        </ul>
+        <p style="margin-top: 10px; margin-bottom: 0;">
+          <strong>This action cannot be undone!</strong>
+        </p>
+      </div>
+      <div id="passwordSection" class="mt-3">
+        <label for="adminPasswordInput">Enter Admin Password to Confirm:</label>
+        <input
+          type="password"
+          id="adminPasswordInput"
+          placeholder="Admin password"
+          style="margin-top: 5px;"
+        />
+        <div id="passwordError" class="text-error" style="margin-top: 5px; display: none;"></div>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-danger" id="confirmResetBtn" style="flex: 1;">
+          Yes, Delete Everything
+        </button>
+        <button class="btn btn-outline" id="cancelResetBtn" style="flex: 1;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Confirmation Modal -->
+  <div id="downloadConfirmModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Download Dataset</h2>
+        <button class="modal-close" id="closeDownloadConfirmModal">&times;</button>
+      </div>
+      <p>You are about to download all songs, instruments, stems, and WAV files as a ZIP archive.</p>
+
+      <div class="card mt-3" style="background-color: var(--background);">
+        <div class="toggle-container">
+          <label>
+            <div class="toggle">
+              <input type="checkbox" id="applyOffsetsToggle">
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <span><strong>Apply Offsets to WAV Files</strong></span>
+        </div>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-top: 10px; margin-bottom: 0;">
+          When enabled, WAV files will be modified to reflect their offset values:
+        </p>
+        <ul class="text-secondary" style="font-size: 0.9rem; margin-top: 5px; padding-left: 20px;">
+          <li><strong>Positive offset:</strong> Trim the beginning of the audio</li>
+          <li><strong>Negative offset:</strong> Add silence to the beginning</li>
+          <li>The offset_seconds column in stems.csv will be set to 0</li>
+        </ul>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">
+          When disabled, WAV files and offsets are exported as-is.
+        </p>
+      </div>
+
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-primary" id="confirmDownloadBtn" style="flex: 1;">
+          Download
+        </button>
+        <button class="btn btn-outline" id="cancelDownloadBtn" style="flex: 1;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Progress Modal -->
+  <div id="downloadModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>Downloading Data</h2>
+      </div>
+      <div id="downloadStatus" class="text-center" style="padding: 20px;">
+        <div class="spinner" style="margin: 0 auto 20px auto;"></div>
+        <p id="downloadStatusText">Preparing download...</p>
+        <div style="background-color: var(--border); border-radius: 4px; height: 20px; overflow: hidden; margin-top: 15px;">
+          <div id="downloadProgressBar" style="background-color: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-top: 10px;" id="downloadProgressDetails"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Song Modal -->
+  <div id="addSongModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Add New Song</h2>
+        <button class="modal-close" id="closeAddSongModal">&times;</button>
+      </div>
+
+      <div class="mt-3">
+        <label for="newSongTitle">Title *</label>
+        <input
+          type="text"
+          id="newSongTitle"
+          placeholder="e.g., My Song Title"
+          required
+        />
+      </div>
+
+      <div class="mt-3">
+        <label for="newSongId">Song ID (auto-generated)</label>
+        <input
+          type="number"
+          id="newSongId"
+          placeholder="0"
+          value="0"
+          min="0"
+        />
+        <div id="songIdError" class="text-error" style="margin-top: 5px; display: none;"></div>
+      </div>
+
+      <div class="mt-3">
+        <label for="newSongBpm">BPM (default: 120)</label>
+        <input
+          type="number"
+          id="newSongBpm"
+          placeholder="120"
+          value="120"
+          min="1"
+          max="300"
+        />
+        <div id="bpmError" class="text-error" style="margin-top: 5px; display: none;"></div>
+      </div>
+
+      <div class="mt-3">
+        <label>Time Signature (default: 4/4)</label>
+        <div class="flex items-center gap-2">
+          <input
+            type="number"
+            id="newSongTimeSignatureNumerator"
+            placeholder="4"
+            value="4"
+            min="1"
+            max="32"
+            style="width: 80px;"
+          />
+          <span style="font-size: 1.5rem; font-weight: bold;">/</span>
+          <input
+            type="number"
+            id="newSongTimeSignatureDenominator"
+            placeholder="4"
+            value="4"
+            min="1"
+            max="32"
+            style="width: 80px;"
+          />
+        </div>
+        <div id="timeSignatureError" class="text-error" style="margin-top: 5px; display: none;"></div>
+      </div>
+
+      <div id="adminPasswordSection" class="mt-3">
+        <label for="addSongAdminPassword">Admin Password</label>
+        <input
+          type="password"
+          id="addSongAdminPassword"
+          placeholder="Enter admin password"
+          required
+        />
+        <div id="adminPasswordError" class="text-error" style="margin-top: 5px; display: none;"></div>
+      </div>
+
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-primary" id="confirmAddSongBtn" style="flex: 1;">
+          Add Song
+        </button>
+        <button class="btn btn-outline" id="cancelAddSongBtn" style="flex: 1;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSZip library for creating ZIP files -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script type="module" src="js/song-list.js"></script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Song Detail - Stem Dataset Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Global notification container -->
+  <div id="notificationContainer" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 600px; padding: 0 15px;"></div>
+
+  <div class="container">
+    <button class="btn btn-outline mb-3" onclick="location.href='song-list.html'">
+      ← Back to Song List
+    </button>
+
+    <div id="loadingSpinner">
+      <div class="spinner"></div>
+      <p class="text-center">Loading song...</p>
+    </div>
+
+    <div id="songContent" class="hidden">
+      <!-- Header -->
+      <h1 id="songTitle">Loading...</h1>
+
+      <!-- BPM Display (Read-only) -->
+      <div id="bpmDisplay" class="flex items-center gap-2 mb-2">
+        <h3 class="text-secondary" style="margin: 0;">BPM: <span id="bpmValue">--</span></h3>
+        <button class="btn btn-outline" id="editBpmBtn" style="padding: 5px 10px; font-size: 0.9rem;" title="Edit BPM">
+          ✏️
+        </button>
+      </div>
+
+      <!-- BPM Edit (Hidden by default) -->
+      <div id="bpmEdit" class="flex items-center gap-2 mb-2 hidden">
+        <h3 class="text-secondary" style="margin: 0;">BPM:</h3>
+        <input
+          type="number"
+          id="bpmInput"
+          min="1"
+          max="300"
+          step="1"
+          required
+          pattern="[0-9]+"
+          style="width: 80px; margin: 0; padding: 5px;"
+        />
+        <button class="btn btn-primary" id="saveBpmBtn" style="padding: 5px 15px;">
+          Save
+        </button>
+        <button class="btn btn-outline" id="cancelBpmBtn" style="padding: 5px 15px;">
+          Cancel
+        </button>
+        <span id="bpmSaveStatus" class="text-secondary" style="font-size: 0.9rem;"></span>
+      </div>
+
+      <!-- Time Signature Display (Read-only) -->
+      <div id="timeSignatureDisplay" class="flex items-center gap-2 mb-2">
+        <h3 class="text-secondary" style="margin: 0;">Time Signature: <span id="timeSignatureValue">--</span></h3>
+        <button class="btn btn-outline" id="editTimeSignatureBtn" style="padding: 5px 10px; font-size: 0.9rem;" title="Edit Time Signature">
+          ✏️
+        </button>
+      </div>
+
+      <!-- Time Signature Edit (Hidden by default) -->
+      <div id="timeSignatureEdit" class="flex items-center gap-2 mb-2 hidden">
+        <h3 class="text-secondary" style="margin: 0;">Time Signature:</h3>
+        <input
+          type="number"
+          id="timeSignatureNumerator"
+          placeholder="4"
+          min="1"
+          max="32"
+          style="width: 60px; margin: 0; padding: 5px;"
+        />
+        <span style="font-size: 1.5rem; font-weight: bold;">/</span>
+        <input
+          type="number"
+          id="timeSignatureDenominator"
+          placeholder="4"
+          min="1"
+          max="32"
+          style="width: 60px; margin: 0; padding: 5px;"
+        />
+        <button class="btn btn-primary" id="saveTimeSignatureBtn" style="padding: 5px 15px;">
+          Save
+        </button>
+        <button class="btn btn-outline" id="cancelTimeSignatureBtn" style="padding: 5px 15px;">
+          Cancel
+        </button>
+        <span id="timeSignatureSaveStatus" class="text-secondary" style="font-size: 0.9rem;"></span>
+      </div>
+
+      <!-- Stem Mixer -->
+      <div class="card mt-3">
+        <h3>Stem Mixer</h3>
+        <div id="stemMixer">
+          <p class="text-secondary">No stems available yet. Click "Edit Stems" below to add stems.</p>
+        </div>
+      </div>
+
+      <!-- Playback Options -->
+      <div class="card mt-3">
+        <h3>Playback Options</h3>
+
+        <div class="toggle-container">
+          <label>
+            <div class="toggle">
+              <input type="checkbox" id="clickTrackToggle" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <span>Click Track</span>
+        </div>
+
+        <div class="toggle-container">
+          <label>
+            <div class="toggle">
+              <input type="checkbox" id="countInToggle" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <span>Count-In (one bar before start)</span>
+        </div>
+
+        <div class="toggle-container">
+          <label>
+            <div class="toggle">
+              <input type="checkbox" id="mainGridlinesToggle" checked>
+              <span class="toggle-slider"></span>
+            </div>
+          </label>
+          <span>Show Gridlines</span>
+        </div>
+
+        <div class="mt-2" style="padding: 15px; background-color: var(--background); border-radius: 4px;">
+          <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-primary);">
+            Click Track Duration
+          </label>
+          <div class="flex items-center gap-2">
+            <input
+              type="number"
+              id="durationMinutes"
+              min="0"
+              max="60"
+              step="1"
+              value="0"
+              pattern="[0-9]+"
+              style="width: 70px; margin: 0; padding: 8px;"
+            />
+            <span>min</span>
+            <input
+              type="number"
+              id="durationSeconds"
+              min="0"
+              max="59"
+              step="1"
+              value="30"
+              pattern="[0-9]+"
+              style="width: 70px; margin: 0; padding: 8px;"
+            />
+            <span>sec</span>
+          </div>
+          <p class="text-secondary" style="font-size: 0.85rem; margin-top: 8px; margin-bottom: 0;">
+            <span id="durationHint">Minimum: length of longest stem</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="card mt-3">
+        <h3>Playback</h3>
+
+        <div class="playback-controls">
+          <button class="btn btn-primary play-button" id="playPauseBtn">
+            ▶
+          </button>
+          <button class="btn btn-primary play-button" id="resetBtn">
+            ⏹
+          </button>
+        </div>
+
+        <div class="waveform-container" style="position: relative;">
+          <canvas id="waveform" width="800" height="150"></canvas>
+          <div id="playbackIndicator" style="position: absolute; top: 0; left: 0; width: 2px; height: 150px; background-color: red;"></div>
+        </div>
+
+        <div id="playbackStatus" class="text-secondary text-center">
+          Ready to play
+        </div>
+      </div>
+
+      <!-- Edit Stems and Delete Song Buttons -->
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-secondary" id="editStemsBtn" style="flex: 1; padding: 15px 30px; font-size: 1.1rem;">
+          Edit Stems
+        </button>
+        <button class="btn" id="deleteSongBtn" style="flex: 1; padding: 15px 30px; font-size: 1.1rem; background-color: #dc3545; color: white; border: 1px solid #dc3545;">
+          Delete Song
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit Stems Modal -->
+    <div id="editStemsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Stems</h2>
+          <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+
+        <div id="instrumentListView">
+          <h3>Select Instrument</h3>
+          <p class="text-secondary">Click an instrument to expand and view its takes:</p>
+          <div id="instrumentList"></div>
+        </div>
+
+        <div id="stemEditView" class="hidden">
+          <button class="btn btn-outline mb-2" id="backToInstrumentListBtn">
+            ← Back to Instrument List
+          </button>
+
+          <h3 id="editingInstrumentName">Editing...</h3>
+
+          <div class="mt-2">
+            <label for="takeNameInput">Take Name:</label>
+            <input
+              type="text"
+              id="takeNameInput"
+              placeholder="e.g., 2024-01-10_14-30-00"
+              style="width: 100%; margin-top: 5px;"
+            />
+            <p class="text-secondary" style="font-size: 0.85rem; margin-top: 5px;">
+              Name this take to distinguish it from other recordings.
+            </p>
+          </div>
+
+          <div class="mt-3">
+            <label>Upload WAV File</label>
+            <input
+              type="file"
+              id="wavFileInput"
+              accept=".wav,audio/wav,audio/x-wav"
+              style="margin-bottom: 10px;"
+            />
+            <button class="btn btn-primary" id="loadWavBtn">
+              Upload & Load WAV File
+            </button>
+            <div id="uploadProgress" class="hidden mt-2">
+              <div style="background-color: var(--border); border-radius: 4px; height: 8px; overflow: hidden;">
+                <div id="uploadProgressBar" style="background-color: var(--primary); height: 100%; width: 0%;"></div>
+              </div>
+              <p class="text-secondary text-center" style="font-size: 0.85rem; margin-top: 5px;">
+                <span id="uploadProgressText">Uploading...</span>
+              </p>
+            </div>
+          </div>
+
+          <div id="wavLoadedSection" class="hidden">
+            <div class="alert alert-success mt-2">
+              ✓ WAV file uploaded successfully
+            </div>
+
+            <div id="editingExistingTakeBanner" class="alert mt-2 hidden" style="background-color: #e3f2fd; border-left: 4px solid #2196F3; color: #1565C0;">
+              <strong>ℹ️ Editing an existing take?</strong> Upload a new WAV file to replace it, or adjust the offset below. Changes are saved when you click "Save Stem".
+            </div>
+
+            <div class="card mt-3">
+              <h4>Playback Options</h4>
+              <div class="toggle-container" style="margin-bottom: 10px;">
+                <label>
+                  <div class="toggle">
+                    <input type="checkbox" id="previewClickTrackToggle" checked>
+                    <span class="toggle-slider"></span>
+                  </div>
+                </label>
+                <span>Play Metronome</span>
+              </div>
+              <div class="toggle-container" style="margin-bottom: 10px;">
+                <label>
+                  <div class="toggle">
+                    <input type="checkbox" id="previewGridlinesToggle" checked>
+                    <span class="toggle-slider"></span>
+                  </div>
+                </label>
+                <span>Show Gridlines</span>
+              </div>
+            </div>
+
+            <div class="card mt-3">
+              <h4>Preview</h4>
+              <div class="playback-controls">
+                <button class="btn btn-primary play-button" id="previewPlayPauseBtn">
+                  ▶
+                </button>
+                <button class="btn btn-primary play-button" id="previewResetBtn">
+                  ⏹
+                </button>
+              </div>
+              <div class="waveform-container" style="position: relative;">
+                <canvas id="previewWaveform" width="800" height="150"></canvas>
+                <div id="previewPlaybackIndicator" style="position: absolute; top: 0; left: 0; width: 2px; height: 150px; background-color: red;"></div>
+              </div>
+              <div id="previewPlaybackStatus" class="text-secondary text-center">
+                Ready to play
+              </div>
+            </div>
+
+            <div class="card mt-3">
+              <h4>Adjust Offset</h4>
+              <p class="text-secondary" style="font-size: 0.9rem;">
+                Align your stem so the song start (excluding pickup) begins on the lowest bar number, on beat 1.
+                <br>
+                <strong>Negative offset</strong> = add silence before stem
+                <br>
+                <strong>Positive offset</strong> = trim from start
+              </p>
+
+              <div class="slider-container">
+                <div class="slider-label">
+                  <span>Offset:</span>
+                  <span id="offsetValue">0.00s</span>
+                </div>
+                <input
+                  type="range"
+                  id="offsetSlider"
+                  min="-5"
+                  max="5"
+                  step="0.01"
+                  value="0"
+                />
+              </div>
+
+              <div class="flex gap-2 items-center">
+                <label style="margin: 0;">Or enter precise value (seconds):</label>
+                <input
+                  type="number"
+                  id="offsetInput"
+                  step="0.01"
+                  value="0"
+                  min="-3600"
+                  max="3600"
+                  style="width: 120px; margin-bottom: 0;"
+                />
+              </div>
+
+              <div class="flex gap-2 mt-2">
+                <label>Slider Range:</label>
+                <input type="number" id="sliderMin" value="-5" step="0.1" min="-3600" max="3600" style="width: 80px; margin-bottom: 0;" />
+                <span>to</span>
+                <input type="number" id="sliderMax" value="5" step="0.1" min="-3600" max="3600" style="width: 80px; margin-bottom: 0;" />
+                <button class="btn btn-outline" id="updateRangeBtn" style="padding: 8px 15px;">
+                  Update Range
+                </button>
+              </div>
+            </div>
+
+            <div class="flex gap-2 mt-3">
+              <button class="btn btn-primary" id="saveStemBtn">
+                Save Stem
+              </button>
+              <button class="btn btn-outline" id="cancelEditBtn">
+                Cancel
+              </button>
+              <button class="btn" id="deleteStemBtn" style="margin-left: auto; background-color: #dc3545; color: white; border: 1px solid #dc3545; display: none;">
+                Delete Take
+              </button>
+            </div>
+          </div>
+
+          <div id="wavLoadingSpinner" class="hidden">
+            <div class="spinner"></div>
+            <p class="text-center">Loading audio file...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Song Modal -->
+    <div id="deleteSongModal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2>Delete Song</h2>
+          <button class="modal-close" id="closeDeleteSongModal">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          <strong>⚠️ WARNING:</strong> You are about to delete:
+          <div id="deleteSongDetails" style="margin-top: 10px; padding-left: 10px;"></div>
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            <strong>This action cannot be undone!</strong>
+          </p>
+        </div>
+        <div class="mt-3">
+          <label for="deleteSongAdminPassword">Enter Admin Password to Confirm:</label>
+          <input
+            type="password"
+            id="deleteSongAdminPassword"
+            placeholder="Admin password"
+            style="margin-top: 5px;"
+          />
+          <div id="deleteSongPasswordError" class="text-error" style="margin-top: 5px; display: none;"></div>
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button class="btn" id="confirmDeleteSongBtn" style="flex: 1; background-color: #dc3545; color: white; border: 1px solid #dc3545;">
+            Yes, Delete Song
+          </button>
+          <button class="btn btn-outline" id="cancelDeleteSongBtn" style="flex: 1;">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Stem Modal -->
+    <div id="deleteStemModal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2>Delete Take</h2>
+          <button class="modal-close" id="closeDeleteStemModal">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          <strong>⚠️ WARNING:</strong> You are about to delete this take and its associated WAV file.
+          <p style="margin-top: 10px; margin-bottom: 0;">
+            <strong>This action cannot be undone!</strong>
+          </p>
+        </div>
+        <p class="mt-3">Are you sure you want to delete this take?</p>
+        <div class="flex gap-2 mt-3">
+          <button class="btn" id="confirmDeleteStemBtn" style="flex: 1; background-color: #dc3545; color: white; border: 1px solid #dc3545;">
+            Yes, Delete Take
+          </button>
+          <button class="btn btn-outline" id="cancelDeleteStemBtn" style="flex: 1;">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/song-detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stem-Separated Dataset Playback Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container container-narrow">
+    <h1 class="text-center">Stem-Separated Dataset Playback Helper</h1>
+
+    <div class="mt-3">
+      <h2>Welcome!</h2>
+
+      <p>
+        This tool helps musicians record stem-separated datasets.
+        It provides click tracks and playback of previously-recorded stems to help each musician
+        add their part to the ensemble recording.
+      </p>
+
+      <div class="card mt-3">
+        <h3>How the Recording Process Works</h3>
+        <p>
+          Each instrument in your ensemble will record in a specific order. This order matters because
+          later musicians can hear and play along with earlier recordings:
+        </p>
+        <ol style="padding-left: 20px; line-height: 2;">
+          <li><strong>First Instrument</strong> records with only the click track</li>
+          <li><strong>Second Instrument</strong> records with the click track + playback of the first instrument</li>
+          <li><strong>Third Instrument</strong> records with the click track + playback of the first two instruments</li>
+          <li>And so on, until all instruments have recorded for every song</li>
+        </ol>
+        <p class="mt-2">
+          This layering approach allows each musician to build on what came before, creating a
+          cohesive ensemble performance even when recording separately.
+        </p>
+      </div>
+
+      <div class="card mt-3">
+        <h3>What This Tool Provides</h3>
+        <ul style="padding-left: 20px; line-height: 2;">
+          <li>Click tracks at song-specific BPMs and time signatures</li>
+          <li>Playback of previously-recorded stems with volume control</li>
+          <li>Multiple takes support - record and manage different versions for each instrument</li>
+          <li>Take selection in the mixer to choose which version to hear during playback</li>
+          <li>Offset alignment to synchronize stems with the click track</li>
+          <li>Progress tracking across your ensemble</li>
+          <li>Direct audio file upload to secure cloud storage</li>
+        </ul>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <strong>Getting Started:</strong> You'll first set up passwords, input your song list,
+        then define your ensemble's instruments in recording order.
+      </div>
+
+      <div class="text-center mt-3">
+        <button class="btn btn-primary" id="continueBtn" style="padding: 15px 40px; font-size: 1.1rem;">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      window.location.href = 'passwords-setup.html';
+    });
+  </script>
+</body>
+</html>

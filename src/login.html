@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Stem Dataset Helper</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container container-narrow">
+    <h1 class="text-center">Stem-Separated Dataset Playback Helper</h1>
+
+    <div class="card mt-3">
+      <h3>Enter Website Password</h3>
+      <p class="text-secondary">
+        Please enter the website password to access the application.
+      </p>
+      <p class="text-secondary" style="font-size: 0.9rem; margin-top: 10px;">
+        <em>Don't know the password? Contact your ensemble administrator.</em>
+      </p>
+
+      <div id="errorMessage" class="hidden"></div>
+      <div id="lockoutMessage" class="hidden"></div>
+
+      <div class="mt-3">
+        <label for="passwordInput">Website Password</label>
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Enter password"
+          style="margin-top: 5px;"
+          autofocus
+        />
+      </div>
+
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-primary" id="loginBtn" style="flex: 1;">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>
