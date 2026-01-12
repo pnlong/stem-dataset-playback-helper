@@ -53,7 +53,6 @@ This keeps your credentials private while allowing others to use the template:
 
 ### Step 1: Create Your Own Repo from Template
 
-**Option A: Use Template Button (Recommended)**
 1. Click the **"Use this template"** button at the top of this GitHub repo
 2. Choose a name (e.g., "my-ensemble-playback")
 3. **Set visibility to Private** (keeps your credentials private)
@@ -63,12 +62,6 @@ This keeps your credentials private while allowing others to use the template:
    git clone https://github.com/YOUR_USERNAME/my-ensemble-playback.git
    cd my-ensemble-playback
    ```
-
-**Option B: Fork and Make Private**
-1. Fork this repository
-2. Go to your fork's Settings → General → Danger Zone
-3. **Change repository visibility to Private**
-4. Clone your fork locally
 
 ### Step 2: Create Supabase Project
 
@@ -216,8 +209,13 @@ CREATE POLICY "Public can update wav files" ON storage.objects
    cp config.js.example config.js
    ```
 
-4. Open `src/js/config.js` in your code editor
-5. Replace the placeholder values with your actual credentials:
+4. **Remove config.js from .gitignore:**
+   - Open `.gitignore` in your code editor
+   - Remove or comment out the line: `src/js/config.js`
+   - This allows you to commit your credentials to your **private** repo (which is safe since the repo is private)
+
+5. Open `src/js/config.js` in your code editor
+6. Replace the placeholder values with your actual credentials:
 
 ```javascript
 const SUPABASE_URL = 'https://your-project-id.supabase.co';
