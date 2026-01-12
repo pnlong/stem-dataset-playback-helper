@@ -54,10 +54,11 @@ This keeps your credentials private while allowing others to use the template:
 ### Step 1: Create Your Own Repo from Template
 
 1. Click the **"Use this template"** button at the top of this GitHub repo
-2. Choose a name (e.g., "my-ensemble-playback")
-3. **Set visibility to Private** (keeps your credentials private)
-4. Click **"Create repository from template"**
-5. Clone your new private repo:
+2. Select **"Create a new repository"** from the dropdown menu
+3. Choose a name (e.g., "my-ensemble-playback")
+4. **Set visibility to Private** (keeps your credentials private)
+5. Click **"Create repository from template"**
+6. Clone your new private repo:
    ```bash
    git clone https://github.com/YOUR_USERNAME/my-ensemble-playback.git
    cd my-ensemble-playback
