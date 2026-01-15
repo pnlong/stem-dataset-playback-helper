@@ -131,27 +131,23 @@ CREATE POLICY "Public can update wav files" ON storage.objects
    - Go to **Data API** section
    - Copy the **Project URL** (e.g., `https://abcdefghijk.supabase.co`)
 
-2. **Get Anon Key:**
+2. **Get Publishable API Key:**
    - Still in **Project Settings**, go to **API Keys** section
-   - Expand **Legacy anon, service_role API keys**
-   - Copy the **anon public** key (long JWT string starting with `eyJ...`)
-   - ⚠️ **Do NOT copy the service_role key** - that one is actually sensitive!
+   - Look for **Publishable API keys** section
+   - Copy the **publishable** key (starts with `sb_publishable_...`)
+   - ⚠️ **Note**: If you don't see "Publishable API keys", look for "Legacy anon, service_role API keys" and use the **anon public** key instead (starts with `eyJ...`)
+   - ⚠️ **Do NOT copy the service_role or secret key** - those are actually sensitive!
 
-### 5. Create config.js Locally
+### 5. Update credentials.js
 
-```bash
-cd src/js
-cp config.js.example config.js
-```
-
-Now edit `src/js/config.js` and replace the placeholders:
+Edit `src/js/credentials.js` and replace the two placeholder values:
 
 ```javascript
-const SUPABASE_URL = 'https://your-actual-project-id.supabase.co';
-const SUPABASE_ANON_KEY = 'your-actual-long-anon-key-here';
+export const SUPABASE_URL = 'https://your-actual-project-id.supabase.co';
+export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...'; // Your actual key here
 ```
 
-**Note:** `config.js` is in `.gitignore` so it won't be committed to this repo!
+**Important:** Only edit the two values after the `=` signs. Don't remove the `export` keyword!
 
 ### 6. Start Local Server
 
@@ -234,8 +230,9 @@ WAV files are now uploaded directly through the website to your Supabase Storage
 
 ### "Supabase credentials not configured" warning
 
-- Check that you edited `src/js/config.js` (not `config.js.example`)
-- Make sure you replaced BOTH `SUPABASE_URL` and `SUPABASE_ANON_KEY`
+- Check that you edited `src/js/credentials.js`
+- Make sure you replaced BOTH `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`
+- Ensure you kept the `export` keyword before each variable
 - Check for typos in the values
 
 ### Stuck on song list page / Can't access anything
@@ -314,27 +311,29 @@ If the page is stuck or you can't get past authentication:
 
 When everything works locally:
 
-1. **Make sure config.js is NOT committed:**
-   ```bash
-   git status
-   # Should NOT see src/js/config.js listed
+1. **Reset credentials to placeholders:**
+   - Open `src/js/credentials.js`
+   - Change back to:
+   ```javascript
+   export const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+   export const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
    ```
 
-2. **Commit your changes (without credentials):**
+2. **Commit your changes (with placeholder credentials):**
    ```bash
    git add .
    git commit -m "Finalize template"
    git push
    ```
 
-3. **Create your private deployment repo:**
+3. **Create your deployment repo:**
    - On GitHub, click "Use this template" on this repo
    - Name it something like "my-ensemble-playback"
-   - **Set visibility to Private**
-   - Clone the new private repo
-   - Copy your `config.js` to the private repo
-   - Commit and push to private repo
-   - Deploy from private repo to GitHub Pages
+   - **Set visibility to Public** (or Private with GitHub PRO)
+   - Clone the new repo
+   - Edit `src/js/credentials.js` with YOUR actual credentials
+   - Commit and push: `git commit -m "Add Supabase credentials" src/js/credentials.js && git push`
+   - Deploy to GitHub Pages from `main` branch `/src` folder
 
 ## Database Migration (For Existing Users)
 
@@ -377,10 +376,12 @@ CREATE INDEX idx_stems_take ON stems(song_id, instrument_id, take);
 
 Once deployed, share:
 - ✅ The GitHub Pages URL with your team
-- ✅ The same Supabase credentials (via secure channel - email, Slack, etc.)
-- ❌ DON'T make your private repo public (keeps credentials in GitHub private)
+- ✅ The repo URL if they need to see the code or make changes
 
 Your team members can then:
 - Visit the deployed site URL
 - All use the same database
 - See shared progress
+- Clone the repo and make changes if needed
+
+**Note:** Your credentials are visible in the browser and in the repo (in credentials.js). This is fine - Supabase publishable keys are designed for client-side use and protected by RLS.

@@ -345,9 +345,9 @@ Supabase CRUD operations.
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 // Instruments
 async function saveInstruments(instruments) {
@@ -444,7 +444,7 @@ Load environment variables (Supabase credentials).
 ```javascript
 // These will be set via environment variables or hardcoded after deployment
 export const SUPABASE_URL = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+export const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || 'YOUR_SUPABASE_PUBLISHABLE_KEY';
 ```
 
 **Note**: For GitHub Pages, we'll use a build step or manual replacement to inject credentials from `.env` file.
@@ -570,7 +570,7 @@ CREATE POLICY "Enable all operations for stems" ON stems
 2. Edit `.env` and add your Supabase credentials:
    ```
    SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key-here
+   SUPABASE_PUBLISHABLE_KEY=your-publishable-key-here
    ```
 3. Update `src/js/config.js` with your credentials (for GitHub Pages deployment)
 

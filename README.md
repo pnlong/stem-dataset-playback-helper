@@ -7,7 +7,7 @@ A web-based tool designed to help musical ensembles create stem-separated audio 
 > This repository contains NO actual credentials - it's a template for others to use.
 > To use this tool:
 > 1. Click "Use this template" to create your own repository (public or private with GitHub PRO)
-> 2. Add your Supabase credentials to `config.js`
+> 2. Add your Supabase credentials to `src/js/credentials.js` (just 2 lines!)
 > 3. Deploy to GitHub Pages from the `main` branch
 >
 > **Note:** Your credentials will be visible in the browser (unavoidable for static sites), so using a public repo is fine. Supabase publishable keys are designed for client-side use and protected by Row Level Security.
@@ -205,21 +205,23 @@ CREATE POLICY "Public can update wav files" ON storage.objects
    - ⚠️ **Note**: If you don't see "Publishable API keys", look for "Legacy anon, service_role API keys" and use the **anon public** key instead (starts with `eyJ...`)
    - ⚠️ **Do NOT copy the service_role or secret key** - those are actually sensitive!
 
-3. **Update your config file:**
-   - Open `src/js/config.js` in your code editor
-   - Replace the placeholder values with your actual credentials:
+3. **Update your credentials file:**
+   - Open `src/js/credentials.js` in your code editor
+   - Replace the two placeholder values with your actual credentials:
 
 ```javascript
-const SUPABASE_URL = 'https://your-project-id.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_...'; // Your publishable key here
+export const SUPABASE_URL = 'https://your-project-id.supabase.co';
+export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...';
 ```
+
+   - ⚠️ **Important**: Only edit the two values - don't remove the `export` keyword or change anything else!
 
 ⚠️ **Understanding This Approach:**
 
 **This repo is a public template with NO real credentials committed.**
 
 When you create your deployment repo from this template:
-- ✅ You add YOUR real credentials to `config.js`
+- ✅ You add YOUR real credentials to `credentials.js` (just 2 lines!)
 - ✅ Commit them to your repo (public or private)
 - ✅ Deploy directly to GitHub Pages from the `main` branch
 - ✅ Credentials will be visible in browser (unavoidable for static sites)
@@ -244,9 +246,9 @@ When you create your deployment repo from this template:
 
 ### Step 6: Deploy to GitHub Pages
 
-1. **Commit your config with credentials:**
+1. **Commit your credentials:**
    ```bash
-   git commit -m "Add Supabase configuration" src/js/config.js
+   git commit -m "Add Supabase credentials" src/js/credentials.js
    git push
    ```
 
@@ -406,9 +408,10 @@ When you or your ensemble members visit the website:
 
 ### "Supabase credentials not configured" warning
 
-- Open `src/js/config.js`
-- Make sure you replaced `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY` with your actual values
+- Open `src/js/credentials.js`
+- Make sure you replaced `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_PUBLISHABLE_KEY` with your actual values
 - Check for typos in the credentials
+- Ensure you kept the `export` keyword before each variable
 - Ensure you're using the correct key format (`sb_publishable_...` or `eyJ...` for legacy keys)
 
 ### Changes not showing after deployment
@@ -427,7 +430,8 @@ When you or your ensemble members visit the website:
 ### Website works locally but not on GitHub Pages
 
 - Check that all file paths are relative (not absolute)
-- Verify credentials in `config.js` are correct
+- Verify credentials in `credentials.js` are correct and properly formatted
+- Ensure you didn't accidentally remove the `export` keyword
 - Check browser console for errors (F12 → Console tab)
 - Ensure GitHub Pages is enabled in Settings → Pages
 
@@ -558,7 +562,8 @@ Built for musicians recording stem-separated datasets with layered ensemble perf
 - `src/setup-instruments.html` - Instrument ordering
 - `src/song-list.html` - Main song list
 - `src/song-detail.html` - Playback and stem management
-- `src/js/config.js` - **Supabase credentials (edit with your values)**
+- `src/js/credentials.js` - **Your Supabase credentials (edit this file with your values)**
+- `src/js/config.js` - Supabase client setup (don't edit this)
 - `src/js/db.js` - Database functions
 - `src/js/audio.js` - Audio processing
 - `src/css/styles.css` - Styling
