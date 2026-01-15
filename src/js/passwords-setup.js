@@ -38,7 +38,6 @@ function setupPasswordToggle(button, input) {
     // Keep monospace font when showing password
     input.style.fontFamily = "'Courier New', Courier, monospace";
     input.style.letterSpacing = "0.05em";
-    console.log('Showing password for', input.id);
   };
 
   const hide = (e) => {
@@ -47,7 +46,6 @@ function setupPasswordToggle(button, input) {
     // Monospace font is already applied via CSS
     input.style.fontFamily = "";
     input.style.letterSpacing = "";
-    console.log('Hiding password for', input.id);
   };
 
   button.addEventListener('mousedown', show);

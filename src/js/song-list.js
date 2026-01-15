@@ -868,20 +868,9 @@ async function handleAddSong() {
   try {
     confirmAddSongBtn.disabled = true;
 
-    // Get passwords from database
-    const passwords = await getPasswords();
-    if (!passwords) {
-      throw new Error('Passwords not configured');
-    }
-
     // Verify admin password
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    if (hashHex !== passwords.admin_password_hash) {
+    const isValid = await verifyAdminPassword(password);
+    if (!isValid) {
       throw new Error('Incorrect admin password');
     }
 

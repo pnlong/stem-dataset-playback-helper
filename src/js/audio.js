@@ -44,9 +44,6 @@ export function createClickTrack(bpm, durationSeconds, beatsPerBar = 4, includeC
   const totalDuration = durationSeconds + countInDuration;
   const totalSamples = Math.ceil(totalDuration * sampleRate);
 
-  console.log('Creating click track - BPM:', bpm, 'Duration:', durationSeconds, 'BeatsPerBar:', beatsPerBar, 'IncludeCountIn:', includeCountIn);
-  console.log('Click track - secondsPerBeat:', secondsPerBeat, 'totalDuration:', totalDuration);
-
   const buffer = audioContext.createBuffer(numChannels, totalSamples, sampleRate);
 
   // Generate click sounds
@@ -356,9 +353,6 @@ export function drawWaveformWithGridlines(buffer, canvas, bpm, beatsPerBar = 4, 
   const secondsPerBar = secondsPerBeat * beatsPerBar;
   const duration = buffer.duration;
 
-  console.log('Gridline drawing - BPM:', bpm, 'BeatsPerBar:', beatsPerBar, 'Duration:', duration);
-  console.log('Gridline drawing - secondsPerBeat:', secondsPerBeat, 'secondsPerBar:', secondsPerBar);
-
   // Make gridlines look similar to playhead indicator but different color
   ctx.strokeStyle = '#0066cc'; // Blue color to distinguish from red playhead
   ctx.lineWidth = 2; // Same width as playhead indicator
@@ -367,11 +361,9 @@ export function drawWaveformWithGridlines(buffer, canvas, bpm, beatsPerBar = 4, 
   // Start at 0 and increment by exactly secondsPerBar to match click track timing
   let barTime = 0;
   let barNumber = 0;
-  const gridlineTimes = [];
   while (barTime <= duration) {
     // Convert time to pixel position
     const x = Math.round((barTime / duration) * width);
-    gridlineTimes.push({ barNumber, time: barTime, x });
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, height);
@@ -380,7 +372,6 @@ export function drawWaveformWithGridlines(buffer, canvas, bpm, beatsPerBar = 4, 
     barNumber++;
     barTime = barNumber * secondsPerBar; // Use multiplication to avoid accumulating rounding errors
   }
-  console.log('Gridlines drawn at:', gridlineTimes);
 }
 
 /**

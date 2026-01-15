@@ -170,15 +170,12 @@ clickTrackToggle.addEventListener('change', () => {
   // - When stopped/paused: do nothing (user must manually reset)
   if (isInCountIn) {
     // Currently in count-in phase, pause (this will reset to 0s automatically)
-    console.log('Click track toggled during count-in, pausing');
     handlePlayPause(); // Pause, which sets position to 0 when in count-in
   } else if (isPlaying && mainClickTrackGainNode) {
     // In main playback, mute/unmute the click track
     if (clickTrackToggle.checked) {
-      console.log('Unmuting click track');
       mainClickTrackGainNode.gain.setValueAtTime(1, audioContext.currentTime);
     } else {
-      console.log('Muting click track');
       mainClickTrackGainNode.gain.setValueAtTime(0, audioContext.currentTime);
     }
   }
@@ -191,11 +188,7 @@ countInToggle.addEventListener('change', () => {
   // - When stopped/paused: do nothing (user must manually reset)
   if (isInCountIn) {
     // Currently in count-in phase, pause (this will reset to 0s automatically)
-    console.log('Count-in toggled off during count-in, pausing');
     handlePlayPause(); // Pause, which sets position to 0 when in count-in
-  } else if (isPlaying) {
-    // In main playback, don't interrupt
-    console.log('Count-in toggled during playback, will apply on next reset');
   }
   // When stopped/paused, do nothing - user must manually reset to apply change
 });
@@ -261,10 +254,8 @@ previewClickTrackToggle.addEventListener('change', () => {
   if (isPreviewPlaying && previewClickTrackGainNode) {
     // In playback, mute/unmute the click track
     if (previewClickTrackToggle.checked) {
-      console.log('Preview: Unmuting click track');
       previewClickTrackGainNode.gain.setValueAtTime(1, audioContext.currentTime);
     } else {
-      console.log('Preview: Muting click track');
       previewClickTrackGainNode.gain.setValueAtTime(0, audioContext.currentTime);
     }
   }
@@ -875,11 +866,9 @@ async function handlePlayPause() {
     // If we're in count-in, reset to 0 (count-in time doesn't count)
     if (isInCountIn) {
       playbackPausedAt = 0;
-      console.log('Paused during count-in, resetting to 0 seconds');
     } else {
       const elapsed = audioContext.currentTime - playbackStartTime;
       playbackPausedAt = elapsed;
-      console.log('Paused at:', playbackPausedAt, 'seconds');
     }
 
     // Stop count-in if playing
@@ -914,7 +903,6 @@ async function handlePlayPause() {
       const displayWidth = waveformCanvas.getBoundingClientRect().width;
       const position = progress * displayWidth;
       playbackIndicator.style.left = `${position}px`;
-      console.log('Indicator position:', position, 'px', 'Display width:', displayWidth);
     } else if (isInCountIn) {
       // Keep indicator at 0 if pausing during count-in
       playbackIndicator.style.left = '0px';
@@ -964,10 +952,7 @@ async function handlePlayPause() {
                               (mainClickTrackBuffer ? mainClickTrackBuffer.duration : 0);
 
         // If buffer was rebuilt while paused, check if position is still valid
-        if (playbackPausedAt > 0 && playbackPausedAt < totalDuration) {
-          console.log('Buffer was rebuilt while paused, attempting to resume from', playbackPausedAt);
-        } else if (playbackPausedAt >= totalDuration) {
-          console.log('Buffer duration changed, resetting to start');
+        if (playbackPausedAt >= totalDuration) {
           playbackPausedAt = 0;
           playbackIndicator.style.left = '0px';
         }
@@ -979,12 +964,10 @@ async function handlePlayPause() {
 
       // Play from paused position or from start
       let startOffset = playbackPausedAt || 0;
-      console.log('Resuming from:', startOffset, 'seconds (paused at:', playbackPausedAt, ')');
       const remainingDuration = totalDuration - startOffset;
 
       if (remainingDuration <= 0.1) {
         // At or near the end, restart from beginning
-        console.log('At end, resetting to start');
         startOffset = 0;
         playbackPausedAt = 0;
         playbackIndicator.style.left = '0px';
@@ -996,8 +979,6 @@ async function handlePlayPause() {
 
       if (shouldPlayCountIn) {
         // Play count-in first, then start main playback after it completes
-        console.log('Playing count-in before main playback');
-
         const startTime = audioContext.currentTime;
         playbackStartTime = startTime; // Start time is now (count-in doesn't count toward playback time)
 
@@ -1006,7 +987,6 @@ async function handlePlayPause() {
         mainCountInSourceNode.buffer = mainCountInBuffer;
         mainCountInSourceNode.connect(audioContext.destination);
         mainCountInSourceNode.start(startTime);
-        console.log('Started count-in at', startTime);
 
         // Set up UI state for count-in
         isPlaying = true;
@@ -1021,12 +1001,10 @@ async function handlePlayPause() {
         mainCountInSourceNode.onended = () => {
           if (!isPlaying) {
             // User paused/reset during count-in
-            console.log('Count-in ended but playback was stopped');
             isInCountIn = false; // Reset flag
             return;
           }
 
-          console.log('Count-in ended, starting main playback');
           isInCountIn = false; // Count-in is over, now in main playback
 
           // Change indicator back to red for main playback
@@ -1042,7 +1020,6 @@ async function handlePlayPause() {
             mainSourceNode.buffer = mainStemsOnlyBuffer;
             mainSourceNode.connect(audioContext.destination);
             mainSourceNode.start(mainStartTime);
-            console.log('Started stems playback at', mainStartTime);
           }
 
           // Play click track separately if available (always start, control with gain)
@@ -1061,7 +1038,6 @@ async function handlePlayPause() {
             mainClickTrackSourceNode.connect(mainClickTrackGainNode);
             mainClickTrackGainNode.connect(audioContext.destination);
             mainClickTrackSourceNode.start(mainStartTime);
-            console.log('Started click track playback at', mainStartTime, 'with gain:', clickTrackToggle.checked ? 1 : 0);
           }
 
           // Start playback indicator animation
@@ -1075,15 +1051,13 @@ async function handlePlayPause() {
               const reachedEnd = elapsed >= (totalDuration - 0.1);
 
               if (reachedEnd) {
-                console.log('Playback naturally ended at', elapsed, 'seconds');
-
                 // Stop all audio sources when primary ends
                 if (mainSourceNode && mainSourceNode !== primarySource) {
-                  try { mainSourceNode.stop(); } catch (e) { console.log('Source already stopped'); }
+                  try { mainSourceNode.stop(); } catch (e) { /* Source already stopped */ }
                   mainSourceNode = null;
                 }
                 if (mainClickTrackSourceNode && mainClickTrackSourceNode !== primarySource) {
-                  try { mainClickTrackSourceNode.stop(); } catch (e) { console.log('Click track already stopped'); }
+                  try { mainClickTrackSourceNode.stop(); } catch (e) { /* Click track already stopped */ }
                   mainClickTrackSourceNode = null;
                 }
                 if (mainClickTrackGainNode) {
@@ -1102,8 +1076,6 @@ async function handlePlayPause() {
                   cancelAnimationFrame(playbackAnimationFrame);
                   playbackAnimationFrame = null;
                 }
-              } else {
-                console.log('Audio stopped early at', elapsed, 'seconds (pause/reset)');
               }
             };
           }
@@ -1112,7 +1084,6 @@ async function handlePlayPause() {
         // No count-in, play normally
         const startTime = audioContext.currentTime;
         playbackStartTime = startTime - startOffset;
-        console.log('playbackStartTime:', playbackStartTime, 'audioContext.currentTime:', startTime, 'startOffset:', startOffset);
 
         // Play stems if available
         if (mainStemsOnlyBuffer) {
@@ -1120,7 +1091,6 @@ async function handlePlayPause() {
           mainSourceNode.buffer = mainStemsOnlyBuffer;
           mainSourceNode.connect(audioContext.destination);
           mainSourceNode.start(startTime, startOffset);
-          console.log('Started stems playback from', startOffset, 'seconds');
         }
 
         // Play click track separately if available (always start, control with gain)
@@ -1139,7 +1109,6 @@ async function handlePlayPause() {
           mainClickTrackSourceNode.connect(mainClickTrackGainNode);
           mainClickTrackGainNode.connect(audioContext.destination);
           mainClickTrackSourceNode.start(startTime, startOffset);
-          console.log('Started click track playback from', startOffset, 'seconds with gain:', clickTrackToggle.checked ? 1 : 0);
         }
 
         isPlaying = true;
@@ -1160,15 +1129,13 @@ async function handlePlayPause() {
             const reachedEnd = elapsed >= (totalDuration - 0.1);
 
             if (reachedEnd) {
-              console.log('Playback naturally ended at', elapsed, 'seconds');
-
               // Stop all audio sources when primary ends
               if (mainSourceNode && mainSourceNode !== primarySource) {
-                try { mainSourceNode.stop(); } catch (e) { console.log('Source already stopped'); }
+                try { mainSourceNode.stop(); } catch (e) { /* Source already stopped */ }
                 mainSourceNode = null;
               }
               if (mainClickTrackSourceNode && mainClickTrackSourceNode !== primarySource) {
-                try { mainClickTrackSourceNode.stop(); } catch (e) { console.log('Click track already stopped'); }
+                try { mainClickTrackSourceNode.stop(); } catch (e) { /* Click track already stopped */ }
                 mainClickTrackSourceNode = null;
               }
               if (mainClickTrackGainNode) {
@@ -1187,14 +1154,11 @@ async function handlePlayPause() {
                 cancelAnimationFrame(playbackAnimationFrame);
                 playbackAnimationFrame = null;
               }
-            } else {
-              console.log('Audio stopped early at', elapsed, 'seconds (pause/reset)');
             }
           };
         }
       }
     } catch (error) {
-      console.error('Error playing:', error);
       playbackStatus.textContent = 'Playback error - please try again';
       showNotification(`Playback error: ${error.message}`, 'error');
       isPlaying = false;
@@ -1745,22 +1709,13 @@ function updatePreview() {
   // Parse time signature to get beats per bar
   const { numerator: beatsPerBar } = parseTimeSignature(currentSong.time_signature || '4/4');
 
-  console.log('Preview - BPM:', currentSong.bpm, 'Time Sig:', currentSong.time_signature, 'Beats per bar:', beatsPerBar);
-
   const offsetBuffer = applyOffsetToBuffer(loadedWavBuffer, currentOffset);
-  console.log('Preview - offsetBuffer duration:', offsetBuffer.duration);
 
   // Store the audio buffer WITHOUT mixing in the click track
   previewBuffer = offsetBuffer;
 
   // Create and store click track separately (for playback, not waveform visualization)
   previewClickTrackBuffer = createClickTrack(currentSong.bpm, offsetBuffer.duration, beatsPerBar);
-  console.log('Preview - clickTrack duration:', previewClickTrackBuffer.duration);
-
-  // Calculate expected bar duration for debugging
-  const secondsPerBeat = 60 / currentSong.bpm;
-  const secondsPerBar = secondsPerBeat * beatsPerBar;
-  console.log('Preview - Seconds per beat:', secondsPerBeat, 'Seconds per bar:', secondsPerBar);
 
   // Draw waveform with or without gridlines based on toggle (waveform shows ONLY the stem, not the click track)
   if (previewGridlinesToggle.checked) {
@@ -1790,7 +1745,6 @@ async function handlePreviewPlayPause() {
     if (previewSourceNode) {
       const elapsed = audioContext.currentTime - previewPlaybackStartTime;
       previewPlaybackPausedAt = elapsed;
-      console.log('Preview paused at:', previewPlaybackPausedAt, 'seconds');
 
       // Update indicator position one final time before stopping
       if (previewBuffer) {
@@ -1836,12 +1790,10 @@ async function handlePreviewPlayPause() {
 
       // Play from paused position or from start
       let startOffset = previewPlaybackPausedAt || 0;
-      console.log('Preview resuming from:', startOffset, 'seconds');
       const remainingDuration = previewBuffer.duration - startOffset;
 
       if (remainingDuration <= 0.1) {
         // At or near the end, restart from beginning
-        console.log('Preview at end, resetting to start');
         startOffset = 0;
         previewPlaybackPausedAt = 0;
         previewPlaybackIndicator.style.left = '0px';
@@ -1873,10 +1825,7 @@ async function handlePreviewPlayPause() {
         previewClickTrackSource.connect(previewClickTrackGainNode);
         previewClickTrackGainNode.connect(audioContext.destination);
         previewClickTrackSource.start(startTime, startOffset);
-        console.log('Preview started click track from', startOffset, 'seconds with gain:', previewClickTrackToggle.checked ? 1 : 0);
       }
-
-      console.log('Preview started playback from', startOffset, 'seconds at time', startTime);
 
       isPreviewPlaying = true;
       previewPlayPauseBtn.textContent = '⏸';
@@ -1893,12 +1842,9 @@ async function handlePreviewPlayPause() {
         const reachedEnd = elapsed >= (previewBuffer.duration - 0.1);
 
         if (reachedEnd) {
-          // Natural end of playback
-          console.log('Preview playback naturally ended at', elapsed, 'seconds');
-
-          // Stop click track when preview stem ends
+          // Natural end of playback - stop click track when preview stem ends
           if (previewClickTrackSource) {
-            try { previewClickTrackSource.stop(); } catch (e) { console.log('Preview click track already stopped'); }
+            try { previewClickTrackSource.stop(); } catch (e) { /* Preview click track already stopped */ }
             previewClickTrackSource = null;
           }
           if (previewClickTrackGainNode) {
@@ -1919,13 +1865,9 @@ async function handlePreviewPlayPause() {
             cancelAnimationFrame(previewAnimationFrame);
             previewAnimationFrame = null;
           }
-        } else {
-          // Stopped early (pause or reset) - don't override the pause position
-          console.log('Preview audio stopped early at', elapsed, 'seconds (pause/reset)');
         }
       };
     } catch (error) {
-      console.error('Error playing preview:', error);
       previewPlaybackStatus.textContent = 'Playback error';
       isPreviewPlaying = false;
       previewPlayPauseBtn.textContent = '▶';
@@ -2003,8 +1945,6 @@ function handleOffsetSliderChange(event) {
   offsetInput.value = currentOffset.toFixed(2);
   offsetValue.textContent = currentOffset.toFixed(2) + 's';
 
-  console.log('Offset changed from', previousOffset, 'to', newOffset, '(change:', offsetChange, ')');
-
   // Stop playback if playing, but preserve pause position
   if (isPreviewPlaying) {
     if (previewSourceNode) {
@@ -2029,30 +1969,24 @@ function handleOffsetSliderChange(event) {
 
   // Store old pause time before updating preview
   const oldPausedTime = previewPlaybackPausedAt;
-  console.log('Old paused time:', oldPausedTime);
 
   // Update preview with new offset
   updatePreview();
-
-  console.log('After updatePreview - new buffer duration:', previewBuffer ? previewBuffer.duration : 'null');
 
   // Adjust paused time based on offset change
   // If offset increases (trim from start), paused time decreases
   // If offset decreases (add to start), paused time increases
   if (oldPausedTime > 0 && previewBuffer) {
     const newPausedTime = oldPausedTime - offsetChange;
-    console.log('Adjusting paused time by offset change - new time:', newPausedTime);
 
     if (newPausedTime < 0) {
       // New paused time is before the start, reset to 0
-      console.log('New paused time is negative, resetting to 0');
       previewPlaybackPausedAt = 0;
       previewPlaybackIndicator.style.left = '0px';
       const totalStr = formatTime(previewBuffer.duration);
       previewPlaybackStatus.textContent = `0:00 / ${totalStr}`;
     } else if (newPausedTime > previewBuffer.duration) {
       // New paused time is beyond the end, reset to 0
-      console.log('New paused time exceeds buffer duration, resetting to 0');
       previewPlaybackPausedAt = 0;
       previewPlaybackIndicator.style.left = '0px';
       const totalStr = formatTime(previewBuffer.duration);
@@ -2063,14 +1997,11 @@ function handleOffsetSliderChange(event) {
       const progress = previewPlaybackPausedAt / previewBuffer.duration;
       const displayWidth = previewWaveformCanvas.getBoundingClientRect().width;
       const position = progress * displayWidth;
-      console.log('New paused time:', newPausedTime, 'progress:', progress, 'position:', position, 'px');
       previewPlaybackIndicator.style.left = `${position}px`;
       const currentStr = formatTime(previewPlaybackPausedAt);
       const totalStr = formatTime(previewBuffer.duration);
       previewPlaybackStatus.textContent = `${currentStr} / ${totalStr}`;
     }
-  } else {
-    console.log('Not adjusting - oldPausedTime:', oldPausedTime, 'previewBuffer:', previewBuffer ? 'exists' : 'null');
   }
 
   // Update previous offset for next change
@@ -2119,8 +2050,6 @@ function handleOffsetInputChange(event) {
   offsetSlider.value = value;
   offsetValue.textContent = value.toFixed(2) + 's';
 
-  console.log('Offset changed from', previousOffset, 'to', newOffset, '(change:', offsetChange, ')');
-
   // Stop playback if playing, but preserve pause position
   if (isPreviewPlaying) {
     if (previewSourceNode) {
@@ -2145,30 +2074,24 @@ function handleOffsetInputChange(event) {
 
   // Store old pause time before updating preview
   const oldPausedTime = previewPlaybackPausedAt;
-  console.log('Old paused time:', oldPausedTime);
 
   // Update preview with new offset
   updatePreview();
-
-  console.log('After updatePreview - new buffer duration:', previewBuffer ? previewBuffer.duration : 'null');
 
   // Adjust paused time based on offset change
   // If offset increases (trim from start), paused time decreases
   // If offset decreases (add to start), paused time increases
   if (oldPausedTime > 0 && previewBuffer) {
     const newPausedTime = oldPausedTime - offsetChange;
-    console.log('Adjusting paused time by offset change - new time:', newPausedTime);
 
     if (newPausedTime < 0) {
       // New paused time is before the start, reset to 0
-      console.log('New paused time is negative, resetting to 0');
       previewPlaybackPausedAt = 0;
       previewPlaybackIndicator.style.left = '0px';
       const totalStr = formatTime(previewBuffer.duration);
       previewPlaybackStatus.textContent = `0:00 / ${totalStr}`;
     } else if (newPausedTime > previewBuffer.duration) {
       // New paused time is beyond the end, reset to 0
-      console.log('New paused time exceeds buffer duration, resetting to 0');
       previewPlaybackPausedAt = 0;
       previewPlaybackIndicator.style.left = '0px';
       const totalStr = formatTime(previewBuffer.duration);
@@ -2179,14 +2102,11 @@ function handleOffsetInputChange(event) {
       const progress = previewPlaybackPausedAt / previewBuffer.duration;
       const displayWidth = previewWaveformCanvas.getBoundingClientRect().width;
       const position = progress * displayWidth;
-      console.log('New paused time:', newPausedTime, 'progress:', progress, 'position:', position, 'px');
       previewPlaybackIndicator.style.left = `${position}px`;
       const currentStr = formatTime(previewPlaybackPausedAt);
       const totalStr = formatTime(previewBuffer.duration);
       previewPlaybackStatus.textContent = `${currentStr} / ${totalStr}`;
     }
-  } else {
-    console.log('Not adjusting - oldPausedTime:', oldPausedTime, 'previewBuffer:', previewBuffer ? 'exists' : 'null');
   }
 
   // Update previous offset for next change
@@ -2422,20 +2342,9 @@ async function confirmDeleteSong() {
   try {
     confirmDeleteSongBtn.disabled = true;
 
-    // Get passwords from database
-    const passwords = await getPasswords();
-    if (!passwords) {
-      throw new Error('Passwords not configured');
-    }
-
     // Verify admin password
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    if (hashHex !== passwords.admin_password_hash) {
+    const isValid = await verifyAdminPassword(password);
+    if (!isValid) {
       throw new Error('Incorrect admin password');
     }
 
@@ -2467,9 +2376,8 @@ async function resetModalState() {
   if (uploadedButNotSavedUrl) {
     try {
       await deleteWavFile(uploadedButNotSavedUrl);
-      console.log('Deleted unsaved uploaded file:', uploadedButNotSavedUrl);
     } catch (error) {
-      console.warn('Could not delete uploaded file:', error);
+      // Ignore cleanup errors
     }
     uploadedButNotSavedUrl = '';
   }
