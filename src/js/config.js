@@ -1,8 +1,7 @@
 // Supabase configuration
-// IMPORTANT: Copy this file to config.js and replace the placeholder values
-// with your actual Supabase credentials
+// IMPORTANT: Replace these values with your actual Supabase credentials
+// Get these from your Supabase project: Settings > API > Publishable API keys
 
-// Get these from your Supabase project: Settings > API
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
@@ -13,5 +12,5 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Verify configuration on load
 if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
-  console.warn('⚠️ Supabase credentials not configured! Please copy config.js.example to config.js and update with your actual credentials.');
+  console.warn('⚠️ Supabase credentials not configured! Please update config.js with your actual credentials.');
 }

@@ -6,11 +6,11 @@ A web-based tool designed to help musical ensembles create stem-separated audio 
 >
 > This repository contains NO actual credentials - it's a template for others to use.
 > To use this tool:
-> 1. Click "Use this template" to create your own **private** repository
-> 2. Add your Supabase credentials to your private repo
-> 3. Deploy from your private repo to GitHub Pages
+> 1. Click "Use this template" to create your own repository (public or private with GitHub PRO)
+> 2. Add your Supabase credentials to `config.js`
+> 3. Deploy to GitHub Pages from the `main` branch
 >
-> This keeps your credentials private while allowing your ensemble to use the tool!
+> **Note:** Your credentials will be visible in the browser (unavoidable for static sites), so using a public repo is fine. Supabase publishable keys are designed for client-side use and protected by Row Level Security.
 
 ## Features
 
@@ -44,21 +44,21 @@ This repository is a **public template**. To use it for your ensemble:
 
 - GitHub account
 - [Supabase](https://supabase.com) account (free tier works great)
-- Google Drive for hosting WAV files
 - Modern web browser (Chrome, Firefox, Safari, or Edge)
-
-### Recommended Approach: Use Template for Private Deployment
-
-This keeps your credentials private while allowing others to use the template:
 
 ### Step 1: Create Your Own Repo from Template
 
 1. Click the **"Use this template"** button at the top of this GitHub repo
 2. Select **"Create a new repository"** from the dropdown menu
 3. Choose a name (e.g., "my-ensemble-playback")
-4. **Set visibility to Private** (keeps your credentials private)
+4. **Set visibility:**
+   - **Public** (free GitHub Pages)
+   - **Private** (requires GitHub PRO plan for Pages, but keeps your repo private)
+
+   **Note:** Either option is fine! Your credentials will be visible in the browser when users visit the deployed site (unavoidable for static sites), so a public repo doesn't expose anything extra. Supabase publishable keys are designed for client-side use.
+
 5. Click **"Create repository from template"**
-6. Clone your new private repo:
+6. Clone your new repo:
    ```bash
    git clone https://github.com/YOUR_USERNAME/my-ensemble-playback.git
    cd my-ensemble-playback
@@ -198,96 +198,97 @@ CREATE POLICY "Public can update wav files" ON storage.objects
    - Go to **Data API** section
    - Copy the **Project URL** (looks like: `https://xxxxx.supabase.co`)
 
-2. **Get your Anon Key:**
+2. **Get your Publishable API Key:**
    - Still in **Project Settings**, go to **API Keys** section
-   - Expand **Legacy anon, service_role API keys**
-   - Copy the **anon public** key (long JWT string starting with `eyJ...`)
-   - ⚠️ **Do NOT copy the service_role key** - that one is actually sensitive!
+   - Look for **Publishable API keys** section
+   - Copy the **publishable** key (starts with `sb_publishable_...`)
+   - ⚠️ **Note**: If you don't see "Publishable API keys", look for "Legacy anon, service_role API keys" and use the **anon public** key instead (starts with `eyJ...`)
+   - ⚠️ **Do NOT copy the service_role or secret key** - those are actually sensitive!
 
-3. **Create your config file:**
-   ```bash
-   cd src/js
-   cp config.js.example config.js
-   ```
-
-4. **Remove config.js from .gitignore:**
-   - Open `.gitignore` in your code editor
-   - Remove or comment out the line: `src/js/config.js`
-   - This allows you to commit your credentials to your **private** repo (which is safe since the repo is private)
-
-5. Open `src/js/config.js` in your code editor
-6. Replace the placeholder values with your actual credentials:
+3. **Update your config file:**
+   - Open `src/js/config.js` in your code editor
+   - Replace the placeholder values with your actual credentials:
 
 ```javascript
 const SUPABASE_URL = 'https://your-project-id.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-public-key-here';
+const SUPABASE_ANON_KEY = 'sb_publishable_...'; // Your publishable key here
 ```
 
-⚠️ **Understanding Credentials & Privacy:**
+⚠️ **Understanding This Approach:**
 
 **This repo is a public template with NO real credentials committed.**
 
-When you create your **private** deployment repo:
+When you create your deployment repo from this template:
 - ✅ You add YOUR real credentials to `config.js`
-- ✅ Commit them to your **PRIVATE** repo
-- ✅ Deploy to GitHub Pages from **private** repo
-- ✅ Your source code with credentials stays private in GitHub
-- ⚠️ The deployed site is public (credentials visible in browser - this is unavoidable for static sites)
+- ✅ Commit them to your repo (public or private)
+- ✅ Deploy directly to GitHub Pages from the `main` branch
+- ✅ Credentials will be visible in browser (unavoidable for static sites)
+- ✅ Supabase publishable keys are designed for client-side use and protected by RLS
 
-**This approach means:**
-- ✅ This public template has no credentials exposed
-- ✅ Each ensemble creates their own private deployment repo
-- ✅ No risk of accidentally using someone else's database
-- ✅ Clean separation between template and deployment
+**Why this is safe (mostly):**
+- Supabase publishable keys are meant for browsers and mobile apps
+- They're protected by your Row Level Security policies
+- The credentials will be visible in the deployed site anyway (true for all static sites)
+- Using a public repo doesn't expose anything extra
+
+**Security limitations:**
+- ⚠️ Your RLS policies currently allow anyone with the publishable key to read, write, and delete data
+- This means a malicious actor could theoretically access your deployed site, extract the credentials from browser dev tools, and delete everything
+- For this small-scale ensemble tool with non-sensitive data, this risk is acceptable
+- If you need stronger protection, you'd need to implement Supabase Authentication (user accounts with email/password), which adds significant complexity and is overkill for most ensemble use cases
+- In practice, only your ensemble members will know about the site, so the risk is minimal
 
 **Team collaboration:**
-- All YOUR team members should use the SAME private repo and credentials
-- Each DIFFERENT ensemble creates their own private repo with their own Supabase project
+- All YOUR team members use the SAME repo and credentials
+- Each DIFFERENT ensemble creates their own repo with their own Supabase project
 
-### Step 6: Deploy to GitHub Pages (from your Private Repo)
+### Step 6: Deploy to GitHub Pages
 
-1. **Commit everything including config.js:**
+1. **Commit your config with credentials:**
    ```bash
-   git add .
-   git commit -m "Add Supabase configuration"
+   git commit -m "Add Supabase configuration" src/js/config.js
    git push
    ```
 
 2. **Enable GitHub Pages:**
-   - Go to your **private** repository on GitHub
+   - Go to your repository on GitHub
    - Click **Settings** → **Pages** (left sidebar)
    - Under **"Source"**:
-     - Branch: `main` (or `master`)
+     - Branch: `main`
      - Folder: `/src`
    - Click **"Save"**
    - Wait ~1 minute for deployment
    - Access your site at: `https://YOUR_USERNAME.github.io/REPO_NAME/`
 
 ⚠️ **Important Notes:**
-- Your **repository** is private (credentials not visible in GitHub)
-- Your **deployed site** is public (anyone with the URL can use it)
-- The credentials ARE visible in browser dev tools when visiting the site (this is unavoidable for static sites)
-- This is fine - Supabase `anon` keys are designed for client-side use
+- Your credentials are committed to the repo and visible in the deployed site
+- This is fine - Supabase publishable keys are designed for client-side use
+- They're protected by your Row Level Security (RLS) policies
+- Anyone visiting your deployed site can see the credentials in browser dev tools (unavoidable for static sites)
+- Whether your repo is public or private, the deployed site will have visible credentials
 
 ### Step 6b: Local Testing (Recommended!)
 
 Test locally before deploying to make sure everything works:
 
-```bash
-# Using Python 3
-cd src
-python3 -m http.server 8000
+1. **After updating `config.js` with your credentials, start a local server:**
+   ```bash
+   # Using Python 3
+   cd src
+   python3 -m http.server 8000
 
-# Or using Node.js
-cd src
-npx http-server
+   # Or using Node.js
+   cd src
+   npx http-server
 
-# Or using PHP
-cd src
-php -S localhost:8000
-```
+   # Or using PHP
+   cd src
+   php -S localhost:8000
+   ```
 
-Then open `http://localhost:8000` in your browser. You can use the full site locally!
+2. Open `http://localhost:8000` in your browser. You can use the full site locally!
+
+3. Test uploading a song, adding instruments, and uploading WAV files to ensure everything works before deploying.
 
 ### Step 7: Prepare Your Song List CSV
 
@@ -406,14 +407,16 @@ When you or your ensemble members visit the website:
 ### "Supabase credentials not configured" warning
 
 - Open `src/js/config.js`
-- Make sure you replaced `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY`
+- Make sure you replaced `YOUR_SUPABASE_URL` and `YOUR_SUPABASE_ANON_KEY` with your actual values
 - Check for typos in the credentials
+- Ensure you're using the correct key format (`sb_publishable_...` or `eyJ...` for legacy keys)
 
 ### Changes not showing after deployment
 
-- GitHub Pages can take a few minutes to update
+- GitHub Pages can take a few minutes to update after you push
 - Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)
 - Check that you pushed the latest changes to GitHub
+- Verify GitHub Pages is enabled and set to deploy from `main` branch `/src` folder
 
 ### Audio clicks or pops during playback
 
@@ -424,8 +427,9 @@ When you or your ensemble members visit the website:
 ### Website works locally but not on GitHub Pages
 
 - Check that all file paths are relative (not absolute)
-- Verify Supabase credentials are correct in the deployed version
+- Verify credentials in `config.js` are correct
 - Check browser console for errors (F12 → Console tab)
+- Ensure GitHub Pages is enabled in Settings → Pages
 
 ## Exporting Data
 
@@ -554,8 +558,7 @@ Built for musicians recording stem-separated datasets with layered ensemble perf
 - `src/setup-instruments.html` - Instrument ordering
 - `src/song-list.html` - Main song list
 - `src/song-detail.html` - Playback and stem management
-- `src/js/config.js.example` - **Template for Supabase config (copy to config.js)**
-- `src/js/config.js` - **Your Supabase credentials (create from template)**
+- `src/js/config.js` - **Supabase credentials (edit with your values)**
 - `src/js/db.js` - Database functions
 - `src/js/audio.js` - Audio processing
 - `src/css/styles.css` - Styling

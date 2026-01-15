@@ -1,9 +1,6 @@
 # Environment variables (never commit!)
 .env
 
-# Supabase credentials (only commit in your private deployment repo)
-src/js/config.js
-
 # Mac OS
 .DS_Store
 
